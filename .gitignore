@@ -1,0 +1,86 @@
+# Python files
+*.py[cod]
+__pycache__/
+*.so
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+.Python
+
+# Python packaging
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+lib/
+lib64/
+parts/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.manifest
+*.spec
+
+# PyInstaller
+*.log
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+pytest_cache/
+cover/
+pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Pydantic settings (if sensitive data is in .env file)
+.env
+.env.*
+
+# FastAPI specific
+instance/
+__pycache__/
+*.db
+alembic/versions/
+alembic/env.py
+alembic/README
+alembic/versions/*.py
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*~
+
+# Logs and temp files
+*.log
+*.pot
+*.mo
+*.pid
+*.out
+*.err
+*.bak
+*.orig
+*.rej
+*.sublime-project
+*.sublime-workspace
+*.tmp
+*.temp
+*.DS_Store
