@@ -5,48 +5,43 @@ from datetime import datetime
 import os
 import re
 
-# Notification tracker to avoid sending multiple notifications
-notification_sent = {
-    "start": False,
-    "success": False,
-    "failure": False
-}
-
 def sanitize_filename(filename: str) -> str:
     """
     Sanitizes the filename by replacing spaces and colons with underscores.
     """
     return re.sub(r'[:\s]', '_', filename)
 
-def generate_file_paths() -> tuple[str, str]:
+def get_files_from_source_dir_created_today(source_dir: str) -> list[str]:
     """
-    Generates the source and destination file paths with a timestamp for the destination file.
+    Retrieves all files from the source directory that were created today.
     """
-    static_filename = "Screenshot 2024-09-13 at 8.28.34 in the morning.png"
-    source_file = os.path.join(settings.SOURCE_FILE_DIR, static_filename)
-    
-    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    
-    sanitized_static_filename = sanitize_filename(static_filename)
-    
-    destination_filename = f"{current_time}_{sanitized_static_filename}"
-    destination_file = os.path.join(settings.DESTINATION_FILE_DIR, destination_filename)
-    
-    return source_file, destination_file
+    today = datetime.now().strftime("%Y-%m-%d")
+    files_created_today = []
 
-def move_file_between_sftp(source_file_path: str, destination_file_path: str):
+    source_sftp = SFTPClient(settings.SOURCE_SFTP_HOST, settings.SOURCE_SFTP_USER, settings.SOURCE_SFTP_PASS)
+    source_sftp.connect()
+
+    try:
+        all_files = source_sftp.listdir(source_dir)
+        for file_name in all_files:
+            file_info = source_sftp.stat(os.path.join(source_dir, file_name))
+            file_creation_date = datetime.fromtimestamp(file_info.st_mtime).strftime("%Y-%m-%d")
+            if file_creation_date == today:
+                files_created_today.append(file_name)
+    finally:
+        source_sftp.disconnect()
+
+    return files_created_today
+
+def move_files_between_sftp(source_dir: str, destination_dir: str):
     """
-    Handles file transfer between two SFTP servers, including notification logic.
+    Moves all files created today from the source directory to the destination directory.
     """
     source_sftp = SFTPClient(settings.SOURCE_SFTP_HOST, settings.SOURCE_SFTP_USER, settings.SOURCE_SFTP_PASS)
     destination_sftp = SFTPClient(settings.DESTINATION_SFTP_HOST, settings.DESTINATION_SFTP_USER, settings.DESTINATION_SFTP_PASS)
 
-    global notification_sent
-    
     try:
-        if not notification_sent["start"]:
-            send_telegram_notification(f"Starting file transfer from {source_file_path} to {destination_file_path}")
-            notification_sent["start"] = True
+        send_telegram_notification(f"Starting file transfer from {source_dir} to {destination_dir}")
 
         source_sftp.connect()
         destination_sftp.connect()
@@ -54,27 +49,34 @@ def move_file_between_sftp(source_file_path: str, destination_file_path: str):
         if not os.path.exists(settings.TEMPORARY_FILE_DIR):
             os.makedirs(settings.TEMPORARY_FILE_DIR)
 
-        local_temp_file = os.path.join(settings.TEMPORARY_FILE_DIR, os.path.basename(source_file_path))
-        source_sftp.get(source_file_path, local_temp_file)
-        destination_sftp.put(local_temp_file, destination_file_path)
+        files_to_transfer = get_files_from_source_dir_created_today(source_dir)
 
-        if not notification_sent["success"]:
+        if not files_to_transfer:
+            send_telegram_notification("No files created today for transfer.")
+            return
+
+        for file_name in files_to_transfer:
+            source_file_path = os.path.join(source_dir, file_name)
+            local_temp_file = os.path.join(settings.TEMPORARY_FILE_DIR, file_name)
+
+            # Sanitize the destination file name
+            sanitized_filename = sanitize_filename(file_name)
+            current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            destination_file_path = os.path.join(destination_dir, f"{current_time}_{sanitized_filename}")
+
+            # Download file from source SFTP and upload to destination SFTP
+            source_sftp.get(source_file_path, local_temp_file)
+            destination_sftp.put(local_temp_file, destination_file_path)
+
             send_telegram_notification(f"File transfer completed: {source_file_path} -> {destination_file_path}")
-            notification_sent["success"] = True
 
-        if os.path.exists(local_temp_file):
-            os.remove(local_temp_file)
-        
+            if os.path.exists(local_temp_file):
+                os.remove(local_temp_file)
+
     except Exception as e:
-        if not notification_sent["failure"]:
-            send_telegram_notification(f"File transfer failed: {source_file_path} -> {destination_file_path}. Error: {str(e)}")
-            notification_sent["failure"] = True
+        send_telegram_notification(f"File transfer failed. Error: {str(e)}")
         raise e
-    
+
     finally:
         source_sftp.disconnect()
         destination_sftp.disconnect()
-
-        notification_sent["start"] = False
-        notification_sent["success"] = False
-        notification_sent["failure"] = False
