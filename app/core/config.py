@@ -13,7 +13,15 @@ class Settings(BaseSettings):
     TEMPORARY_FILE_DIR: str
     BOT_TOKEN: str
     BOT_CHANNEL: str
-
+    SCHEDULER_MINUTE: str
+    SCHEDULER_HOUR: str
+    SOURCE_FILE_DIR: str
+    DESTINATION_FILE_DIR: str
+    REDIS_HOST: str
+    REDIS_PORT: str
+    REDIS_DB: str
+    REDIS_PASSWORD: str
+        
     class Config:
         env_file = '.env'
 
