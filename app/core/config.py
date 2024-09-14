@@ -26,10 +26,7 @@ class Settings(BaseSettings):
         env_file = '.env'
 
 def get_settings():
-    load_dotenv(override=True)  # Reload the .env file
-    return Settings()           # Re-instantiate the settings to reflect new .env values
+    load_dotenv(override=True)
+    return Settings()
 
-settings = get_settings()       # Initial load
-
-# Example usage of the function when you want to refresh the configuration
 settings = get_settings()
