@@ -1,10 +1,7 @@
 from telebot import TeleBot
-<<<<<<< HEAD
 from ..core import settings
-=======
 from app.core.config import settings
 import threading
->>>>>>> develop
 
 # Use a thread-safe initialization for the bot
 bot = None

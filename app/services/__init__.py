@@ -1,2 +1,2 @@
-from .file_transfer import move_file_between_sftp, generate_file_paths
+from .file_transfer import move_files_between_sftp
 from .telegram_notify import send_telegram_notification, get_telegram_bot
