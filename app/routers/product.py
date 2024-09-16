@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from app.db.session import get_db
 from app.schemas.product import ProductCreate, ProductResponse, ProductUpdate
 from sqlalchemy.orm import Session
-from app.crud.product import (create_product, delete_product, read_product, read_products,
+from app.crud.product import (create_product, delete_product, get_product, get_products,
     update_product)
 
 router  = APIRouter()
@@ -12,12 +12,12 @@ def create_product_route(product_data: ProductCreate, db: Session = Depends(get_
     return create_product(db, product_data)
 
 @router.get("/", response_model=list[ProductResponse])
-def read_products_route(db: Session = Depends(get_db)):
-    return read_products(db)
+def get_products_route(db: Session = Depends(get_db)):
+    return get_products(db)
 
 @router.get("/{product_id}", response_model=ProductResponse)
-def read_product_route(product_id: int, db: Session = Depends(get_db)):
-    return read_product(db, product_id)
+def get_product_route(product_id: int, db: Session = Depends(get_db)):
+    return get_product(db, product_id)
 
 @router.put("/{product_id}", response_model=ProductResponse)
 def update_product_route(product_id: int, product_data: ProductUpdate, db: Session = Depends(get_db)):

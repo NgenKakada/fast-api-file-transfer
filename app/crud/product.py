@@ -15,8 +15,8 @@ def create_product(db:Session, product_data: ProductCreate)-> ProductResponse:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-# READ (Single Product)
-def read_product(db: Session, product_id: int) -> ProductResponse:
+# GET (Single Product)
+def get_product(db: Session, product_id: int) -> ProductResponse:
     try:
         product = db.query(Product).filter(Product.id == product_id).first()
         print("Query executed, product found:", product)  # Debugging output
@@ -29,14 +29,14 @@ def read_product(db: Session, product_id: int) -> ProductResponse:
         print("Error during querying the product:", str(e))  # Debugging output
         raise HTTPException(status_code=500, detail=str(e))
     
-# READ ALL (List of Products)
-def read_products(db:Session)-> list[ProductResponse]:
+# GET ALL (List of Products)
+def get_products(db:Session)-> list[ProductResponse]:
     products = db.query(Product).all()
     return [ProductResponse.from_orm(product) for product in products]
 
 # UPDATE
 def update_product(db:Session, product_id: int, update_data: ProductUpdate)-> ProductResponse:
-    product = read_product(db, product_id)
+    product = get_product(db, product_id)
     if product:
         for var, value in update_data.dict(exclude_unset=True).items():
             setattr(product, var, value)

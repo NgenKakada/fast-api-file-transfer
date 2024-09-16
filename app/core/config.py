@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     REDIS_DB: str
     REDIS_PASSWORD: str
     DATABASE_URL: str    
+    DOC_USERNAME: str
+    DOC_PASSWORD: str
+    APPLICATION_URL: str
+    APPLICATION_PORT:str
     class Config:
         env_file = '.env'
 
