@@ -1,6 +1,6 @@
-from app.core.sftp_client import SFTPClient
-from app.core.config import settings
-from app.services.telegram_notify import send_telegram_notification
+from ..core import SFTPClient
+from ..core import settings
+from .telegram_notify import send_telegram_notification
 from datetime import datetime
 import os
 import re

@@ -2,8 +2,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.redis import RedisJobStore
 from apscheduler.triggers.cron import CronTrigger
 from contextlib import asynccontextmanager
-from app.services.file_transfer import move_file_between_sftp, generate_file_paths
-from app.core.config import settings
+from ..core import settings
 from redis import Redis
 
 # Redis configuration
@@ -29,6 +28,7 @@ scheduler_minute = settings.SCHEDULER_MINUTE
 scheduler_hour = settings.SCHEDULER_HOUR
 
 def run_job_with_lock():
+    from ..services import move_file_between_sftp, generate_file_paths
     """
     Acquires a Redis lock and runs the file transfer job.
     """

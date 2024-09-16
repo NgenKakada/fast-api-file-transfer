@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException
-from app.services.file_transfer import move_file_between_sftp
+from ..services import move_file_between_sftp
 
-router = APIRouter()
+sftp_router = APIRouter()
 
-@router.post('/transfer-file')
+@sftp_router.post('/transfer-file')
 def transfer_file(source_file_path: str, destination_file_path: str):
     try:
         move_file_between_sftp(source_file_path, destination_file_path)

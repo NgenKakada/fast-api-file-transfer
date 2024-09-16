@@ -5,16 +5,15 @@ from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from app.routers import product, sftp
-from app.core.scheduler import lifespan
-from app.core.config import settings 
+from .routers import sftp_router, product_router
+from .core import lifespan, settings
 
 # Initialize FastAPI app, disabling default docs and redoc generation
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
 
 # Include routers for 'Home' and 'Products' sections
-app.include_router(sftp.router, prefix="/sftp", tags=["Home"])
-app.include_router(product.router, prefix="/products", tags=["Products"])
+app.include_router(sftp_router, prefix="/sftp", tags=["Home"])
+app.include_router(product_router, prefix="/products", tags=["Products"])
 
 # Basic Authentication setup
 security = HTTPBasic()

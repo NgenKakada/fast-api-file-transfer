@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.schemas.product import ProductCreate, ProductResponse, ProductUpdate
-from app.models.product import Product
+from app.models import Product
 
 # CREATE
 def create_product(db:Session, product_data: ProductCreate)-> ProductResponse:

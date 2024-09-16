@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Float, Integer, String
-from app.db.base import Base
+from sqlalchemy.orm import relationship
+from ..db import Base, product_category_association
 
 class Product(Base):
     __tablename__ = "products"
@@ -7,3 +8,8 @@ class Product(Base):
     name = Column(String)
     description = Column(String)
     price = Column(Float)
+
+    # Many-to-many relationship with Category
+    categories = relationship(
+        "Category", secondary=product_category_association, back_populates="products"
+    )

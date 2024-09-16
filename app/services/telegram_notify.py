@@ -1,5 +1,5 @@
 from telebot import TeleBot
-from app.core.config import settings
+from ..core import settings
 
 # Initialize the bot globally to ensure it's only initialized once
 bot = None
