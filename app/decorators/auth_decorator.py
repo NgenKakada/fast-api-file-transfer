@@ -16,9 +16,9 @@ def login_required(fn):
 
         try:
             # Extract and validate token using get_current_user
-            db = kwargs.get("db")  # Ensure db is passed to the decorator
+            db = kwargs.get("db")  # Ensure `db` is passed to the decorator
             token_data = await get_current_user(token.split(" ")[1], db)  # Assumes "Bearer <token>"
-            request.state.user = token_data
+            request.state.user = token_data  # Store the user data in request state
             print(token_data)
         
         except Exception:
@@ -26,6 +26,7 @@ def login_required(fn):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid authentication token"
             )
+        
         return await fn(*args, **kwargs)
     
     return wrapper

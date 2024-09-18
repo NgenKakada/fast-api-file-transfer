@@ -3,7 +3,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import jwt  # Using PyJWT instead of authlib.jose for better compatibility
 from passlib.context import CryptContext
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from ..db import get_db
 from ..crud import get_user_by_username
 from .config import settings
@@ -66,8 +66,8 @@ def decode_token(token: str):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-# Synchronously get the current user from the token, directly handling the token for the decorator
-async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+# Asynchronously get the current user from the token, handling the token for the decorator
+async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
     claims = decode_token(token)  # Decode the token
     username = claims.get("sub")  # Get the username (or subject)
 
@@ -77,8 +77,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
             detail="Invalid token",
         )
 
-    # Fetch user from the database using the synchronous db session
-    user = get_user_by_username(db, username=username)
+    # Fetch user from the database asynchronously
+    user = await get_user_by_username(db, username=username)  # Ensure get_user_by_username is async
     
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
